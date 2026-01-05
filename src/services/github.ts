@@ -124,8 +124,9 @@ class GitHubService {
       // Remove multi-line comments
       cleanContent = cleanContent.replace(/\/\*[\s\S]*?\*\//g, '');
 
-      // Replace imported image identifiers with string placeholders so evaluation doesn't need the assets
+      // Replace asset identifiers with string placeholders so evaluation doesn't need the assets
       cleanContent = cleanContent.replace(/imageUrl\s*:\s*([A-Za-z_][\w]*)/g, 'imageUrl: "$1"');
+      cleanContent = cleanContent.replace(/pdfUrl\s*:\s*([A-Za-z_][\w]*)/g, 'pdfUrl: "$1"');
 
       // Grab the right-hand side of the export assignment
       const exportMatch = cleanContent.match(/export\s+(const|let|var)\s+\w+\s*=\s*([\s\S]+)/);
