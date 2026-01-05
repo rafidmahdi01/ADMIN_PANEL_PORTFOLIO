@@ -33,8 +33,11 @@ class GitHubService {
       });
 
       if ('content' in response.data) {
+        // Decode base64 and handle UTF-8
+        const base64 = response.data.content.replace(/\s/g, '');
+        const decoded = decodeURIComponent(escape(atob(base64)));
         return {
-          content: Buffer.from(response.data.content, 'base64').toString('utf-8'),
+          content: decoded,
           sha: response.data.sha,
           path: response.data.path,
         };
@@ -57,7 +60,7 @@ class GitHubService {
     sha?: string
   ): Promise<void> {
     try {
-      const encodedContent = Buffer.from(content).toString('base64');
+      const encodedContent = btoa(unescape(encodeURIComponent(content)));
 
       await this.octokit.rest.repos.createOrUpdateFileContents({
         owner: this.owner,
@@ -108,16 +111,34 @@ class GitHubService {
    */
   parseDataFile<T>(content: string): T[] {
     try {
-      // Remove TypeScript export and type annotations
-      let jsonContent = content
-        .replace(/export\s+const\s+\w+:\s*\w+\[\]\s*=\s*/, '')
-        .replace(/;$/, '')
-        .trim();
+      // Remove UTF-8 BOM if present
+      let cleanContent = content.replace(/^\uFEFF/, '');
+      
+      // Remove import statements
+      cleanContent = cleanContent.replace(/^import\s+.*?;?\s*$/gm, '');
+      
+      // Remove single-line comments
+      cleanContent = cleanContent.replace(/\/\/.*$/gm, '');
+      
+      // Remove multi-line comments
+      cleanContent = cleanContent.replace(/\/\*[\s\S]*?\*\//g, '');
+      
+      // Find the array content - everything between [ and ]
+      const arrayMatch = cleanContent.match(/\[[\s\S]*\]/);
+      if (!arrayMatch) {
+        throw new Error('No array found in file');
+      }
+      
+      let jsonContent = arrayMatch[0];
+      
+      // Remove trailing commas before closing braces/brackets
+      jsonContent = jsonContent.replace(/,(\s*[}\]])/g, '$1');
 
       // Parse the JSON
       return JSON.parse(jsonContent);
     } catch (error) {
       console.error('Error parsing data file:', error);
+      console.error('Content preview:', jsonContent?.substring(0, 200));
       throw new Error('Failed to parse data file');
     }
   }
