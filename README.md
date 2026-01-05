@@ -2,6 +2,8 @@
 
 Admin dashboard for managing Dr. Noor Zaman's portfolio website content via GitHub API.
 
+🔗 **Live Site**: https://adminpanelnoor.netlify.app
+
 ## 🎯 Features
 
 - ✅ **No changes to portfolio code** - Completely separate application
