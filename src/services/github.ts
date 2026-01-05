@@ -110,35 +110,42 @@ class GitHubService {
    * Parse TypeScript data file to JSON
    */
   parseDataFile<T>(content: string): T[] {
+    let jsonContent = '';
     try {
       // Remove UTF-8 BOM if present
       let cleanContent = content.replace(/^\uFEFF/, '');
-      
-      // Remove import statements
-      cleanContent = cleanContent.replace(/^import\s+.*?;?\s*$/gm, '');
-      
+
+      // Remove all import statements (including multiline)
+      cleanContent = cleanContent.replace(/import\s+[\s\S]*?from\s+['"][^'"]+['"];?/g, '');
+
       // Remove single-line comments
       cleanContent = cleanContent.replace(/\/\/.*$/gm, '');
-      
+
       // Remove multi-line comments
       cleanContent = cleanContent.replace(/\/\*[\s\S]*?\*\//g, '');
-      
-      // Find the array content - everything between [ and ]
-      const arrayMatch = cleanContent.match(/\[[\s\S]*\]/);
-      if (!arrayMatch) {
-        throw new Error('No array found in file');
+
+      // Grab the right-hand side of the export assignment
+      const exportMatch = cleanContent.match(/export\s+(const|let|var)\s+\w+\s*=\s*([\s\S]+)/);
+      if (!exportMatch) {
+        throw new Error('No export assignment found in data file');
       }
-      
-      let jsonContent = arrayMatch[0];
-      
-      // Remove trailing commas before closing braces/brackets
+
+      let rhs = exportMatch[2].trim();
+
+      // If an array literal exists, isolate it; otherwise use the whole RHS
+      const arrayMatch = rhs.match(/\[[\s\S]*\]/);
+      jsonContent = arrayMatch ? arrayMatch[0] : rhs;
+
+      // Remove trailing semicolons and trailing commas before closing braces/brackets
+      jsonContent = jsonContent.replace(/;?\s*$/, '');
       jsonContent = jsonContent.replace(/,(\s*[}\]])/g, '$1');
 
-      // Parse the JSON
-      return JSON.parse(jsonContent);
+      // Evaluate as JavaScript (supports single quotes and trailing commas)
+      const data = new Function(`return (${jsonContent});`)();
+      return data as T[];
     } catch (error) {
       console.error('Error parsing data file:', error);
-      console.error('Content preview:', jsonContent?.substring(0, 200));
+      console.error('Content preview:', jsonContent?.substring(0, 500));
       throw new Error('Failed to parse data file');
     }
   }
