@@ -26,6 +26,8 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
     try {
       setLoading(true);
       const result = await githubService.getData<Award>('awards');
+      console.log('📊 Loaded awards:', result.data.length, 'records');
+      console.log('📋 Records:', result.data);
       setAwards(result.data);
       setSha(result.sha);
       setOriginalContent(result.originalContent);
@@ -105,6 +107,21 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
         return;
       }
 
+      // Safety check: Confirm before saving
+      const confirmMsg = editingIndex === -1 
+        ? `Add new award?\n\nCurrent: ${awards.length} records\nAfter save: ${updated.length} records\n\nNew: ${editForm.title}`
+        : `Update award?\n\nTitle: ${editForm.title}\nTotal records: ${updated.length}`;
+      
+      if (!confirm(confirmMsg)) {
+        setSaving(false);
+        return;
+      }
+
+      console.log('💾 Saving awards...');
+      console.log('📊 Current records:', awards.length);
+      console.log('📊 Updated records:', updated.length);
+      console.log('📋 Updated data:', updated);
+
       await githubService.updateData(
         'awards',
         updated,
@@ -115,9 +132,11 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
         originalContent
       );
 
+      console.log('✅ Save successful! Reloading data...');
       await loadAwards();
       setEditForm(null);
       setEditingIndex(null);
+      alert('✅ Saved successfully!');
     } catch (err) {
       setError('Failed to save award');
       console.error(err);

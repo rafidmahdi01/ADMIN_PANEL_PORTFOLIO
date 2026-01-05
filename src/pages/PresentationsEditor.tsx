@@ -13,6 +13,7 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
+  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Presentation | null>(null);
   const [saving, setSaving] = useState(false);
@@ -25,8 +26,11 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
     try {
       setLoading(true);
       const result = await githubService.getData<Presentation>('presentations');
+      console.log('📊 Loaded presentations:', result.data.length, 'records');
+      console.log('📋 Records:', result.data);
       setPresentations(result.data);
       setSha(result.sha);
+      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load presentations. Check GitHub configuration.');
@@ -67,7 +71,8 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
         'Presentation',
         'presentations',
         `Deleted presentation: ${presentations[index].title}`,
-        sha
+        sha,
+        originalContent
       );
       await loadPresentations();
     } catch (err) {
@@ -104,18 +109,36 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
         return;
       }
 
+      // Safety check: Confirm before saving
+      const confirmMsg = editingIndex === -1 
+        ? `Add new presentation?\n\nCurrent: ${presentations.length} records\nAfter save: ${updated.length} records\n\nNew: ${editForm.title}`
+        : `Update presentation?\n\nTitle: ${editForm.title}\nTotal records: ${updated.length}`;
+      
+      if (!confirm(confirmMsg)) {
+        setSaving(false);
+        return;
+      }
+
+      console.log('💾 Saving presentations...');
+      console.log('📊 Current records:', presentations.length);
+      console.log('📊 Updated records:', updated.length);
+      console.log('📋 Updated data:', updated);
+
       await githubService.updateData(
         'presentations',
         updated,
         'Presentation',
         'presentations',
         message,
-        sha
+        sha,
+        originalContent
       );
 
+      console.log('✅ Save successful! Reloading data...');
       await loadPresentations();
       setEditForm(null);
       setEditingIndex(null);
+      alert('✅ Saved successfully!');
     } catch (err) {
       setError('Failed to save presentation');
       console.error(err);

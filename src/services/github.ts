@@ -194,12 +194,57 @@ class GitHubService {
     if (originalContent) {
       // Preserve imports and comments, only replace the data array
       const arrayString = JSON.stringify(data, null, 2);
+      
+      console.log('Original content length:', originalContent.length);
+      console.log('Original content preview:', originalContent.substring(0, 200));
 
-      // Find and replace only the export statement and its array (non-greedy match)
-      newContent = originalContent.replace(
-        /export\s+(const|let|var)\s+(\w+):\s*\w+\[\]\s*=\s*\[[\s\S]*?\];?/,
-        (_match, decl, varName) => `export ${decl} ${varName}: ${typeName}[] = ${arrayString};`
-      );
+      // Find the export statement and extract variable name
+      const exportMatch = originalContent.match(/export\s+(const|let|var)\s+(\w+)(?::\s*[^=]+)?\s*=/);
+      
+      if (!exportMatch) {
+        console.warn('Export statement not found, using fallback format');
+        newContent = this.formatDataFile(data, typeName, variableName);
+      } else {
+        const [fullMatch, decl, varName] = exportMatch;
+        const startIndex = originalContent.indexOf(fullMatch);
+        const arrayStartIndex = originalContent.indexOf('[', startIndex);
+        
+        console.log('Export found at:', startIndex);
+        console.log('Array starts at:', arrayStartIndex);
+        
+        if (arrayStartIndex === -1) {
+          console.warn('Array start not found, using fallback format');
+          newContent = this.formatDataFile(data, typeName, variableName);
+        } else {
+          // Find matching closing bracket
+          let depth = 0;
+          let arrayEndIndex = -1;
+          for (let i = arrayStartIndex; i < originalContent.length; i++) {
+            if (originalContent[i] === '[') depth++;
+            if (originalContent[i] === ']') depth--;
+            if (depth === 0) {
+              arrayEndIndex = i;
+              break;
+            }
+          }
+          
+          console.log('Array ends at:', arrayEndIndex);
+          
+          if (arrayEndIndex === -1) {
+            console.warn('Array end not found, using fallback format');
+            newContent = this.formatDataFile(data, typeName, variableName);
+          } else {
+            // Replace only the export statement and array, keep everything else
+            const beforeExport = originalContent.substring(0, startIndex);
+            const afterArray = originalContent.substring(arrayEndIndex + 1).replace(/^\s*;?/, '');
+            
+            console.log('Before export length:', beforeExport.length);
+            console.log('After array length:', afterArray.length);
+            
+            newContent = beforeExport + `export ${decl} ${varName}: ${typeName}[] = ${arrayString};` + afterArray;
+          }
+        }
+      }
     } else {
       // Fallback to simple format
       newContent = this.formatDataFile(data, typeName, variableName);

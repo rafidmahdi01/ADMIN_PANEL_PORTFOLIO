@@ -13,6 +13,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
+  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<ResearchProject | null>(null);
   const [saving, setSaving] = useState(false);
@@ -25,8 +26,11 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
     try {
       setLoading(true);
       const result = await githubService.getData<ResearchProject>('research-projects');
+      console.log('📊 Loaded research projects:', result.data.length, 'records');
+      console.log('📋 Records:', result.data);
       setProjects(result.data);
       setSha(result.sha);
+      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load research projects. Check GitHub configuration.');
@@ -66,7 +70,8 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         'ResearchProject',
         'researchProjects',
         `Deleted research project: ${projects[index].title}`,
-        sha
+        sha,
+        originalContent
       );
       await loadProjects();
     } catch (err) {
@@ -103,18 +108,36 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         return;
       }
 
+      // Safety check: Confirm before saving
+      const confirmMsg = editingIndex === -1 
+        ? `Add new research project?\n\nCurrent: ${projects.length} records\nAfter save: ${updated.length} records\n\nNew: ${editForm.title}`
+        : `Update research project?\n\nTitle: ${editForm.title}\nTotal records: ${updated.length}`;
+      
+      if (!confirm(confirmMsg)) {
+        setSaving(false);
+        return;
+      }
+
+      console.log('💾 Saving research projects...');
+      console.log('📊 Current records:', projects.length);
+      console.log('📊 Updated records:', updated.length);
+      console.log('📋 Updated data:', updated);
+
       await githubService.updateData(
         'research-projects',
         updated,
         'ResearchProject',
         'researchProjects',
         message,
-        sha
+        sha,
+        originalContent
       );
 
+      console.log('✅ Save successful! Reloading data...');
       await loadProjects();
       setEditForm(null);
       setEditingIndex(null);
+      alert('✅ Saved successfully!');
     } catch (err) {
       setError('Failed to save research project');
       console.error(err);

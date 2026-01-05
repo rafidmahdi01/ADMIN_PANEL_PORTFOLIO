@@ -13,6 +13,7 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
+  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Evaluation | null>(null);
   const [saving, setSaving] = useState(false);
@@ -25,8 +26,11 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
     try {
       setLoading(true);
       const result = await githubService.getData<Evaluation>('evaluation');
+      console.log('📊 Loaded evaluations:', result.data.length, 'records');
+      console.log('📋 Records:', result.data);
       setEvaluations(result.data);
       setSha(result.sha);
+      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load evaluations. Check GitHub configuration.');
@@ -66,7 +70,8 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
         'Evaluation',
         'evaluation',
         `Deleted evaluation: ${evaluations[index].position}`,
-        sha
+        sha,
+        originalContent
       );
       await loadEvaluations();
     } catch (err) {
@@ -103,18 +108,36 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
         return;
       }
 
+      // Safety check: Confirm before saving
+      const confirmMsg = editingIndex === -1 
+        ? `Add new evaluation?\n\nCurrent: ${evaluations.length} records\nAfter save: ${updated.length} records\n\nNew: ${editForm.position}`
+        : `Update evaluation?\n\nPosition: ${editForm.position}\nTotal records: ${updated.length}`;
+      
+      if (!confirm(confirmMsg)) {
+        setSaving(false);
+        return;
+      }
+
+      console.log('💾 Saving evaluations...');
+      console.log('📊 Current records:', evaluations.length);
+      console.log('📊 Updated records:', updated.length);
+      console.log('📋 Updated data:', updated);
+
       await githubService.updateData(
         'evaluation',
         updated,
         'Evaluation',
         'evaluation',
         message,
-        sha
+        sha,
+        originalContent
       );
 
+      console.log('✅ Save successful! Reloading data...');
       await loadEvaluations();
       setEditForm(null);
       setEditingIndex(null);
+      alert('✅ Saved successfully!');
     } catch (err) {
       setError('Failed to save evaluation');
       console.error(err);

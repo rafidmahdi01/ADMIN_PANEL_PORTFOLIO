@@ -26,6 +26,8 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
     try {
       setLoading(true);
       const result = await githubService.getData<Publication>('publications');
+      console.log('📊 Loaded publications:', result.data.length, 'records');
+      console.log('📋 Records:', result.data);
       setPublications(result.data);
       setSha(result.sha);
       setOriginalContent(result.originalContent);
@@ -110,6 +112,21 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         return;
       }
 
+      // Safety check: Confirm before saving
+      const confirmMsg = editingIndex === -1 
+        ? `Add new publication?\n\nCurrent: ${publications.length} records\nAfter save: ${updated.length} records\n\nNew: ${editForm.title}`
+        : `Update publication?\n\nTitle: ${editForm.title}\nTotal records: ${updated.length}`;
+      
+      if (!confirm(confirmMsg)) {
+        setSaving(false);
+        return;
+      }
+
+      console.log('💾 Saving publications...');
+      console.log('📊 Current records:', publications.length);
+      console.log('📊 Updated records:', updated.length);
+      console.log('📋 Updated data:', updated);
+
       await githubService.updateData(
         'publications',
         updated,
@@ -120,9 +137,11 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         originalContent
       );
 
+      console.log('✅ Save successful! Reloading data...');
       await loadPublications();
       setEditForm(null);
       setEditingIndex(null);
+      alert('✅ Saved successfully!');
     } catch (err) {
       setError('Failed to save publication');
       console.error(err);
