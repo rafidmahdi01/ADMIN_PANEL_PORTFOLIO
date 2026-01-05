@@ -144,9 +144,12 @@ class GitHubService {
       jsonContent = jsonContent.replace(/;?\s*$/, '');
       jsonContent = jsonContent.replace(/,(\s*[}\]])/g, '$1');
 
-      // Evaluate as JavaScript (supports single quotes and trailing commas)
-      const data = new Function(`return (${jsonContent});`)();
-      return data as T[];
+      // Normalize to JSON: quote keys and ensure valid JSON
+      const normalized = jsonContent
+        .replace(/(\w+)\s*:/g, '"$1":')
+        .replace(/,(\s*[}\]])/g, '$1');
+
+      return JSON.parse(normalized) as T[];
     } catch (error) {
       console.error('Error parsing data file:', error);
       console.error('Content preview:', jsonContent?.substring(0, 500));
