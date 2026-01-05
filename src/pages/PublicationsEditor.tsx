@@ -13,6 +13,7 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
+  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Publication | null>(null);
   const [saving, setSaving] = useState(false);
@@ -27,6 +28,7 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
       const result = await githubService.getData<Publication>('publications');
       setPublications(result.data);
       setSha(result.sha);
+      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load publications. Check GitHub configuration.');
@@ -67,7 +69,8 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         'Publication',
         'publications',
         `Deleted publication: ${publications[index].title}`,
-        sha
+        sha,
+        originalContent
       );
       await loadPublications();
     } catch (err) {
@@ -113,7 +116,8 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         'Publication',
         'publications',
         message,
-        sha
+        sha,
+        originalContent
       );
 
       await loadPublications();

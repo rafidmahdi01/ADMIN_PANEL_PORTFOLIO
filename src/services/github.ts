@@ -124,6 +124,9 @@ class GitHubService {
       // Remove multi-line comments
       cleanContent = cleanContent.replace(/\/\*[\s\S]*?\*\//g, '');
 
+      // Replace imported image identifiers with string placeholders so evaluation doesn't need the assets
+      cleanContent = cleanContent.replace(/imageUrl\s*:\s*([A-Za-z_][\w]*)/g, 'imageUrl: "$1"');
+
       // Grab the right-hand side of the export assignment
       const exportMatch = cleanContent.match(/export\s+(const|let|var)\s+\w+\s*=\s*([\s\S]+)/);
       if (!exportMatch) {
@@ -161,11 +164,11 @@ class GitHubService {
   /**
    * Get data from a specific data file
    */
-  async getData<T>(fileName: string): Promise<{ data: T[]; sha: string }> {
+  async getData<T>(fileName: string): Promise<{ data: T[]; sha: string; originalContent: string }> {
     const filePath = `data/${fileName}.ts`;
     const file = await this.getFile(filePath);
     const data = this.parseDataFile<T>(file.content);
-    return { data, sha: file.sha };
+    return { data, sha: file.sha, originalContent: file.content };
   }
 
   /**
@@ -177,11 +180,28 @@ class GitHubService {
     typeName: string,
     variableName: string,
     message: string,
-    sha: string
+    sha: string,
+    originalContent?: string
   ): Promise<void> {
     const filePath = `data/${fileName}.ts`;
-    const content = this.formatDataFile(data, typeName, variableName);
-    await this.updateFile(filePath, content, message, sha);
+    
+    let newContent: string;
+    
+    if (originalContent) {
+      // Preserve imports and comments, only replace the data array
+      const arrayString = JSON.stringify(data, null, 2);
+
+          // Find the export statement, keep the original variable name and replace everything after the = sign
+          newContent = originalContent.replace(
+            /export\s+(const|let|var)\s+(\w+)\s*=\s*[\s\S]+/,
+            (_match, decl, varName) => `export ${decl} ${varName}: ${typeName}[] = ${arrayString};\n`
+          );
+    } else {
+      // Fallback to simple format
+      newContent = this.formatDataFile(data, typeName, variableName);
+    }
+    
+    await this.updateFile(filePath, newContent, message, sha);
   }
 }
 
