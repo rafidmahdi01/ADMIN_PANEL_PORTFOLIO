@@ -195,11 +195,11 @@ class GitHubService {
       // Preserve imports and comments, only replace the data array
       const arrayString = JSON.stringify(data, null, 2);
 
-          // Find the export statement, keep the original variable name and replace everything after the = sign
-          newContent = originalContent.replace(
-            /export\s+(const|let|var)\s+(\w+)\s*=\s*[\s\S]+/,
-            (_match, decl, varName) => `export ${decl} ${varName}: ${typeName}[] = ${arrayString};\n`
-          );
+      // Find and replace only the export statement and its array (non-greedy match)
+      newContent = originalContent.replace(
+        /export\s+(const|let|var)\s+(\w+):\s*\w+\[\]\s*=\s*\[[\s\S]*?\];?/,
+        (_match, decl, varName) => `export ${decl} ${varName}: ${typeName}[] = ${arrayString};`
+      );
     } else {
       // Fallback to simple format
       newContent = this.formatDataFile(data, typeName, variableName);
