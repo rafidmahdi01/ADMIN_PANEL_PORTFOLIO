@@ -204,8 +204,19 @@ class GitHubService {
       // Fallback to simple format
       newContent = this.formatDataFile(data, typeName, variableName);
     }
-    
-    await this.updateFile(filePath, newContent, message, sha);
+
+    try {
+      await this.updateFile(filePath, newContent, message, sha);
+    } catch (error: any) {
+      // Handle stale sha by refetching latest and retrying once
+      const msg = error?.message ?? '';
+      if (error?.status === 409 || msg.includes('does not match')) {
+        const latest = await this.getFile(filePath);
+        await this.updateFile(filePath, newContent, message, latest.sha);
+        return;
+      }
+      throw error;
+    }
   }
 }
 
