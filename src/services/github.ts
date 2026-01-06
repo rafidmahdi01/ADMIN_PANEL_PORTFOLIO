@@ -167,9 +167,10 @@ class GitHubService {
 
   /**
    * Get data from a specific data file
+   * Reads from .updates.ts files which contain admin panel additions
    */
   async getData<T>(fileName: string): Promise<{ data: T[]; sha: string; originalContent: string }> {
-    const filePath = `data/${fileName}.ts`;
+    const filePath = `data/${fileName}.updates.ts`;
     const file = await this.getFile(filePath);
     const data = this.parseDataFile<T>(file.content);
     return { data, sha: file.sha, originalContent: file.content };
@@ -177,6 +178,7 @@ class GitHubService {
 
   /**
    * Update data in a specific data file
+   * Writes to .updates.ts files to keep original data safe
    */
   async updateData<T>(
     fileName: string,
@@ -187,7 +189,7 @@ class GitHubService {
     sha: string,
     originalContent?: string
   ): Promise<void> {
-    const filePath = `data/${fileName}.ts`;
+    const filePath = `data/${fileName}.updates.ts`;
     
     let newContent: string;
     
