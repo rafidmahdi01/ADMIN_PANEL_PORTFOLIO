@@ -25,7 +25,7 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
   const loadPublications = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<Publication>('publications', 'books');
+      const result = await githubService.getData<Publication>('publications');
       console.log('📊 Loaded publications:', result.data.length, 'records');
       console.log('📋 Records:', result.data);
       setPublications(result.data);
@@ -69,7 +69,7 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         'publications',
         updated,
         'Publication',
-        'books',
+        'publications',
         `Deleted publication: ${publications[index].title}`,
         sha,
         originalContent
@@ -131,7 +131,7 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         'publications',
         updated,
         'Publication',
-        'books',
+        'publications',
         message,
         sha,
         originalContent

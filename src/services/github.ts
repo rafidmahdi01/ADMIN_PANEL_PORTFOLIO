@@ -199,50 +199,48 @@ class GitHubService {
       console.log('Original content preview:', originalContent.substring(0, 200));
 
       // Find the export statement and extract variable name
-      const exportMatch = originalContent.match(/export\s+(const|let|var)\s+(\w+)(?::\s*[^=]+)?\s*=/);
+      const exportMatch = originalContent.match(/export\s+(const|let|var)\s+(\w+)(?::\s*[^=]+)?\s*=\s*\[/);
       
       if (!exportMatch) {
         console.warn('Export statement not found, using fallback format');
         newContent = this.formatDataFile(data, typeName, variableName);
       } else {
-        const [fullMatch, decl, varName] = exportMatch;
-        const startIndex = originalContent.indexOf(fullMatch);
-        const arrayStartIndex = originalContent.indexOf('[', startIndex);
+        const [, decl, varName] = exportMatch;
+        const startIndex = originalContent.indexOf(exportMatch[0]);
+        const arrayStartIndex = startIndex + exportMatch[0].length - 1; // Position of '['
         
-        console.log('Export found at:', startIndex);
-        console.log('Array starts at:', arrayStartIndex);
-        
-        if (arrayStartIndex === -1) {
-          console.warn('Array start not found, using fallback format');
-          newContent = this.formatDataFile(data, typeName, variableName);
-        } else {
-          // Find matching closing bracket
-          let depth = 0;
-          let arrayEndIndex = -1;
-          for (let i = arrayStartIndex; i < originalContent.length; i++) {
-            if (originalContent[i] === '[') depth++;
-            if (originalContent[i] === ']') depth--;
+        // Find matching closing bracket
+        let depth = 0;
+        let arrayEndIndex = -1;
+        for (let i = arrayStartIndex; i < originalContent.length; i++) {
+          if (originalContent[i] === '[') depth++;
+          if (originalContent[i] === ']') {
+            depth--;
             if (depth === 0) {
               arrayEndIndex = i;
               break;
             }
           }
+        }
+        
+        if (arrayEndIndex === -1) {
+          console.warn('Array end not found, using fallback format');
+          newContent = this.formatDataFile(data, typeName, variableName);
+        } else {
+          // Preserve everything before the export and after the array
+          const beforeExport = originalContent.substring(0, startIndex);
           
-          console.log('Array ends at:', arrayEndIndex);
-          
-          if (arrayEndIndex === -1) {
-            console.warn('Array end not found, using fallback format');
-            newContent = this.formatDataFile(data, typeName, variableName);
-          } else {
-            // Replace only the export statement and array, keep everything else
-            const beforeExport = originalContent.substring(0, startIndex);
-            const afterArray = originalContent.substring(arrayEndIndex + 1).replace(/^\s*;?/, '');
-            
-            console.log('Before export length:', beforeExport.length);
-            console.log('After array length:', afterArray.length);
-            
-            newContent = beforeExport + `export ${decl} ${varName}: ${typeName}[] = ${arrayString};` + afterArray;
+          // Find the semicolon after the array, or end of line
+          let afterArrayStart = arrayEndIndex + 1;
+          const remainingContent = originalContent.substring(afterArrayStart);
+          const semicolonMatch = remainingContent.match(/^\s*;/);
+          if (semicolonMatch) {
+            afterArrayStart += semicolonMatch[0].length;
           }
+          const afterArray = originalContent.substring(afterArrayStart);
+          
+          // Reconstruct the file with updated data
+          newContent = beforeExport + `export ${decl} ${varName}: ${typeName}[] = ${arrayString};` + afterArray;
         }
       }
     } else {
