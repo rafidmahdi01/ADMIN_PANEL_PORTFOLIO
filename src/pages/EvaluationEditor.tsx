@@ -25,7 +25,7 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
   const loadEvaluations = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<Evaluation>('evaluation');
+      const result = await githubService.getData<Evaluation>('evaluation', 'evaluation');
       console.log('📊 Loaded evaluations:', result.data.length, 'records');
       console.log('📋 Records:', result.data);
       setEvaluations(result.data);

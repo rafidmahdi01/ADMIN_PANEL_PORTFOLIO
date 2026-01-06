@@ -25,7 +25,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
   const loadProjects = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<ResearchProject>('research-projects');
+      const result = await githubService.getData<ResearchProject>('research-projects', 'projects');
       console.log('📊 Loaded research projects:', result.data.length, 'records');
       console.log('📋 Records:', result.data);
       setProjects(result.data);
@@ -68,7 +68,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         'research-projects',
         updated,
         'ResearchProject',
-        'researchProjects',
+        'projects',
         `Deleted research project: ${projects[index].title}`,
         sha,
         originalContent
@@ -127,7 +127,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         'research-projects',
         updated,
         'ResearchProject',
-        'researchProjects',
+        'projects',
         message,
         sha,
         originalContent

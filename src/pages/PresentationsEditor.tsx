@@ -25,7 +25,7 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
   const loadPresentations = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<Presentation>('presentations');
+      const result = await githubService.getData<Presentation>('presentations', 'presentations');
       console.log('📊 Loaded presentations:', result.data.length, 'records');
       console.log('📋 Records:', result.data);
       setPresentations(result.data);

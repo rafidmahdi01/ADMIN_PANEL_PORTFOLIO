@@ -13,7 +13,6 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
-  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Supervision | null>(null);
   const [saving, setSaving] = useState(false);
@@ -25,10 +24,9 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
   const loadSupervisions = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<Supervision>('supervision');
+      const result = await githubService.getData<Supervision>('supervision', 'supervisions');
       setSupervisions(result.data);
       setSha(result.sha);
-      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load supervision records. Check GitHub configuration.');
@@ -67,10 +65,9 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
         'supervision',
         updated,
         'Supervision',
-        'supervision',
+        'supervisions',
         `Deleted supervision: ${supervisions[index].studentName}`,
-        sha,
-        originalContent
+        sha
       );
       await loadSupervisions();
     } catch (err) {
@@ -111,10 +108,9 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
         'supervision',
         updated,
         'Supervision',
-        'supervision',
+        'supervisions',
         message,
-        sha,
-        originalContent
+        sha
       );
 
       await loadSupervisions();
