@@ -1,0 +1,74 @@
+﻿// Add this method before the closing brace of the GitHubService class
+
+  /**
+   * Special handler for supervision data that splits into ongoing and completed arrays
+   */
+  async updateSupervisionData(
+    data: any[],
+    message: string,
+    sha: string
+  ): Promise<void> {
+    const filePath = 'data/supervision.updates.ts';
+    
+    // Split data by status
+    const ongoing = data.filter(item => item.status === 'ongoing');
+    const completed = data.filter(item => item.status === 'completed');
+    
+    // Create the file content with two separate exports
+    const content = // Admin panel updates for supervision
+// This file is managed by the admin panel - do not edit manually
+
+export const ongoingSupervisionsUpdates: any[] = ;
+
+export const completedSupervisionsUpdates: any[] = ;
+;
+    
+    try {
+      await this.updateFile(filePath, content, message, sha);
+    } catch (error: any) {
+      // Handle stale sha by refetching latest and retrying once
+      const msg = error?.message ?? '';
+      if (error?.status === 409 || msg.includes('does not match')) {
+        const latest = await this.getFile(filePath);
+        await this.updateFile(filePath, content, message, latest.sha);
+        return;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Special handler for getting supervision data that combines both arrays
+   */
+  async getSupervisionData(): Promise<{ data: any[]; sha: string; originalContent: string }> {
+    const filePath = 'data/supervision.updates.ts';
+    const file = await this.getFile(filePath);
+    
+    // Parse both arrays from the file
+    const ongoingMatch = file.content.match(/export\s+const\s+ongoingSupervisionsUpdates:\s*any\[\]\s*=\s*(\[[\s\S]*?\]);/);
+    const completedMatch = file.content.match(/export\s+const\s+completedSupervisionsUpdates:\s*any\[\]\s*=\s*(\[[\s\S]*?\]);/);
+    
+    let ongoing: any[] = [];
+    let completed: any[] = [];
+    
+    if (ongoingMatch) {
+      try {
+        ongoing = JSON.parse(ongoingMatch[1]);
+      } catch (e) {
+        console.error('Failed to parse ongoing supervisions:', e);
+      }
+    }
+    
+    if (completedMatch) {
+      try {
+        completed = JSON.parse(completedMatch[1]);
+      } catch (e) {
+        console.error('Failed to parse completed supervisions:', e);
+      }
+    }
+    
+    // Combine both arrays
+    const data = [...ongoing, ...completed];
+    
+    return { data, sha: file.sha, originalContent: file.content };
+  }

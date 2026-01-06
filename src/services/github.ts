@@ -160,9 +160,9 @@ class GitHubService {
   /**
    * Convert JSON data back to TypeScript format
    */
-  formatDataFile(data: any[], typeName: string, variableName: string): string {
+  formatDataFile(data: any[], variableName: string): string {
     const jsonString = JSON.stringify(data, null, 2);
-    return `export const ${variableName}: ${typeName}[] = ${jsonString};\n`;
+    return `export const ${variableName}: any[] = ${jsonString};\n`;
   }
 
   /**
@@ -205,7 +205,7 @@ class GitHubService {
       
       if (!exportMatch) {
         console.warn('Export statement not found, using fallback format');
-        newContent = this.formatDataFile(data, typeName, variableName);
+        newContent = this.formatDataFile(data, variableName);
       } else {
         const [, decl, varName] = exportMatch;
         const startIndex = originalContent.indexOf(exportMatch[0]);
@@ -227,7 +227,7 @@ class GitHubService {
         
         if (arrayEndIndex === -1) {
           console.warn('Array end not found, using fallback format');
-          newContent = this.formatDataFile(data, typeName, variableName);
+          newContent = this.formatDataFile(data, variableName);
         } else {
           // Preserve everything before the export and after the array
           const beforeExport = originalContent.substring(0, startIndex);
@@ -247,7 +247,7 @@ class GitHubService {
       }
     } else {
       // Fallback to simple format
-      newContent = this.formatDataFile(data, typeName, variableName);
+      newContent = this.formatDataFile(data, variableName);
     }
 
     try {
