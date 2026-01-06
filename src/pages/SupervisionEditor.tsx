@@ -24,7 +24,7 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
   const loadSupervisions = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<Supervision>('supervision', 'supervisions');
+      const result = await githubService.getData<Supervision>('supervision');
       setSupervisions(result.data);
       setSha(result.sha);
       setError('');

@@ -25,7 +25,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
   const loadProjects = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<ResearchProject>('research-projects', 'projects');
+      const result = await githubService.getData<ResearchProject>('research-projects');
       console.log('📊 Loaded research projects:', result.data.length, 'records');
       console.log('📋 Records:', result.data);
       setProjects(result.data);

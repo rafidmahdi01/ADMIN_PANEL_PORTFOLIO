@@ -25,7 +25,7 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
   const loadAwards = async () => {
     try {
       setLoading(true);
-      const result = await githubService.getData<Award>('awards', 'awards');
+      const result = await githubService.getData<Award>('awards');
       console.log('📊 Loaded awards:', result.data.length, 'records');
       console.log('📋 Records:', result.data);
       setAwards(result.data);
