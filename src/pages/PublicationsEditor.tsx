@@ -256,16 +256,18 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Type *
+                  Type * <span className="text-gray-500 text-xs">(Select publication type)</span>
                 </label>
                 <select
                   value={editForm.type}
                   onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Publication['type'] })}
                   className="input"
                 >
-                  <option value="journal">Journal Article</option>
-                  <option value="conference">Conference Paper</option>
-                  <option value="book-chapter">Book Chapter</option>
+                  <option value="journal">📄 Journal Article</option>
+                  <option value="conference">🎤 Conference Paper</option>
+                  <option value="proceedings">📋 Conference Proceedings</option>
+                  <option value="book-chapter">📖 Book Chapter</option>
+                  <option value="book">📚 Book</option>
                 </select>
               </div>
               <div>
@@ -280,6 +282,31 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
                   placeholder="10.1234/example"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cover Image URL <span className="text-gray-500 text-xs">(Optional - Book cover or thumbnail)</span>
+              </label>
+              <input
+                type="url"
+                value={editForm.imageUrl || ''}
+                onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })}
+                className="input"
+                placeholder="https://example.com/book-cover.jpg"
+              />
+              {editForm.imageUrl && (
+                <div className="mt-2">
+                  <img 
+                    src={editForm.imageUrl} 
+                    alt="Cover preview" 
+                    className="h-32 w-auto object-cover rounded border border-gray-300"
+                    onError={(e) => {
+                      e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EInvalid URL%3C/text%3E%3C/svg%3E';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 pt-4">

@@ -44,6 +44,8 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
       description: '',
       startDate: new Date().toISOString().split('T')[0],
       status: 'ongoing',
+      role: 'project-leader',
+      scope: 'international',
     };
     setEditForm(newProject);
     setEditingIndex(-1);
@@ -266,21 +268,79 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
                 value={editForm.fundingAgency || ''}
                 onChange={(e) => setEditForm({ ...editForm, fundingAgency: e.target.value })}
                 className="input"
-                placeholder="Name of funding organization"
+                placeholder="KACST, Kingdom of Saudi Arabia"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount
-              </label>
-              <input
-                type="text"
-                value={editForm.amount || ''}
-                onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
-                className="input"
-                placeholder="$100,000"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Grant Number <span className="text-gray-500 text-xs">(Grant No)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.grantNumber || ''}
+                  onChange={(e) => setEditForm({ ...editForm, grantNumber: e.target.value })}
+                  className="input"
+                  placeholder="11-INF1814-06"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amount <span className="text-gray-500 text-xs">(Funding)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.amount || ''}
+                  onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                  className="input"
+                  placeholder="SR 1,000,000"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
+                </label>
+                <select
+                  value={editForm.role || 'project-leader'}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value as ResearchProject['role'] })}
+                  className="input"
+                >
+                  <option value="project-leader">🎯 Project Leader</option>
+                  <option value="co-investigator">🤝 Co-Investigator</option>
+                  <option value="researcher">🔬 Researcher</option>
+                  <option value="consultant">💼 Consultant</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Scope
+                </label>
+                <select
+                  value={editForm.scope || 'international'}
+                  onChange={(e) => setEditForm({ ...editForm, scope: e.target.value as ResearchProject['scope'] })}
+                  className="input"
+                >
+                  <option value="international">🌍 International</option>
+                  <option value="national">🏯 National</option>
+                  <option value="regional">🗺️ Regional</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location <span className="text-gray-500 text-xs">(Country)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.location || ''}
+                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  className="input"
+                  placeholder="KACST, Saudi Arabia"
+                />
+              </div>
             </div>
 
             <div className="flex gap-2 pt-4">

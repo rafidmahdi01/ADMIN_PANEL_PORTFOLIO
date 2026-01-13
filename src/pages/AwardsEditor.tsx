@@ -42,7 +42,11 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
     const newAward: Award = {
       title: '',
       organization: '',
+      institution: '',
       date: new Date().toISOString().split('T')[0],
+      year: new Date().getFullYear().toString(),
+      category: 'awards',
+      type: '',
     };
     setEditForm(newAward);
     setEditingIndex(-1);
@@ -219,14 +223,71 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date <span className="text-red-500">*</span>
+                Institution <span className="text-gray-500 text-xs">(Organization name for display)</span>
               </label>
               <input
-                type="date"
-                value={editForm.date}
-                onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                type="text"
+                value={editForm.institution || ''}
+                onChange={(e) => setEditForm({ ...editForm, institution: e.target.value })}
                 className="input"
+                placeholder="Research Chef Association United States"
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.date}
+                  onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Year <span className="text-gray-500 text-xs">(For display)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.year || ''}
+                  onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
+                  className="input"
+                  placeholder="2023"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category
+                </label>
+                <select
+                  value={editForm.category || 'awards'}
+                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value as Award['category'] })}
+                  className="input"
+                >
+                  <option value="awards">🏆 Awards</option>
+                  <option value="services">🤝 Services</option>
+                  <option value="honors">⭐ Honors</option>
+                  <option value="fellowships">🎓 Fellowships</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Type <span className="text-gray-500 text-xs">(Specific role or category)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.type || ''}
+                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                  className="input"
+                  placeholder="Editorial Board Member Of Prestigious Journals"
+                />
+              </div>
             </div>
 
             <div>

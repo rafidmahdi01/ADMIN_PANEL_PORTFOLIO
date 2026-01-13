@@ -44,7 +44,11 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
       event: '',
       location: '',
       date: new Date().toISOString().split('T')[0],
-      type: 'contributed',
+      startDate: '',
+      endDate: '',
+      year: new Date().getFullYear().toString(),
+      type: 'oral-presenter',
+      scope: 'international',
     };
     setEditForm(newPresentation);
     setEditingIndex(-1);
@@ -232,31 +236,84 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={editForm.date}
-                onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                className="input"
-              />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.date}
+                  onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date <span className="text-gray-500 text-xs">(Date range)</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.startDate || ''}
+                  onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date <span className="text-gray-500 text-xs">(Date range)</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.endDate || ''}
+                  onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                  className="input"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Type <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={editForm.type}
-                onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Presentation['type'] })}
-                className="input"
-              >
-                <option value="keynote">Keynote</option>
-                <option value="invited">Invited Talk</option>
-                <option value="contributed">Contributed</option>
-              </select>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Year <span className="text-gray-500 text-xs">(For display)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.year || ''}
+                  onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
+                  className="input"
+                  placeholder="2025"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={editForm.type}
+                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Presentation['type'] })}
+                  className="input"
+                >
+                  <option value="keynote">🎤 Keynote Speaker</option>
+                  <option value="invited">👤 Invited Speaker</option>
+                  <option value="event-organiser">📋 Event Organiser</option>
+                  <option value="oral-presenter">🗣️ Oral Presenter</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Scope
+                </label>
+                <select
+                  value={editForm.scope || 'international'}
+                  onChange={(e) => setEditForm({ ...editForm, scope: e.target.value as Presentation['scope'] })}
+                  className="input"
+                >
+                  <option value="international">🌍 International</option>
+                  <option value="national">🇯 National</option>
+                  <option value="regional">🗺️ Regional</option>
+                </select>
+              </div>
             </div>
 
             <div>

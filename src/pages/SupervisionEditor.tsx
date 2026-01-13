@@ -43,6 +43,7 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
       topic: '',
       year: new Date().getFullYear().toString(),
       status: 'ongoing',
+      role: 'main-supervisor',
     };
     setEditForm(newSupervision);
     setEditingIndex(-1);
@@ -196,9 +197,26 @@ export default function SupervisionEditor({ onLogout }: SupervisionEditorProps) 
                 onChange={(e) => setEditForm({ ...editForm, level: e.target.value as Supervision['level'] })}
                 className="input"
               >
-                <option value="phd">PhD</option>
-                <option value="masters">Masters</option>
-                <option value="undergraduate">Undergraduate</option>
+                <option value="phd">🎓 PhD</option>
+                <option value="masters">📚 Masters</option>
+                <option value="masters-by-research">🔬 Master by Research</option>
+                <option value="undergraduate">👨‍🎓 Undergraduate</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Role <span className="text-gray-500 text-xs">(Your supervision role)</span>
+              </label>
+              <select
+                value={editForm.role || 'main-supervisor'}
+                onChange={(e) => setEditForm({ ...editForm, role: e.target.value as Supervision['role'] })}
+                className="input"
+              >
+                <option value="main-supervisor">👨‍🏫 Main Supervisor</option>
+                <option value="co-supervisor">🤝 Co-Supervisor</option>
+                <option value="advisor">💡 Advisor</option>
+                <option value="examiner">📝 Examiner</option>
               </select>
             </div>
 

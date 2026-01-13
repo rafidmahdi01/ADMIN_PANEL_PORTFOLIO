@@ -44,6 +44,10 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
       organization: '',
       period: '',
       description: '',
+      category: 'journal-editorial',
+      type: '',
+      startDate: '',
+      endDate: '',
     };
     setEditForm(newEvaluation);
     setEditingIndex(-1);
@@ -214,21 +218,75 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
                 value={editForm.organization}
                 onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
                 className="input"
-                placeholder="Journal name, Conference name, etc."
+                placeholder="Computers, Materials & Continua (CMC), SCI"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Period <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={editForm.period}
-                onChange={(e) => setEditForm({ ...editForm, period: e.target.value })}
-                className="input"
-                placeholder="2024 or 2022-2024"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category
+                </label>
+                <select
+                  value={editForm.category || 'journal-editorial'}
+                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value as Evaluation['category'] })}
+                  className="input"
+                >
+                  <option value="journal-editorial">📰 Journal Editorial</option>
+                  <option value="thesis-evaluation">📖 Thesis Evaluation</option>
+                  <option value="academic-promotion">🎓 Academic Promotion</option>
+                  <option value="all">📋 All Activities</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Type <span className="text-gray-500 text-xs">(Activity type)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.type || ''}
+                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                  className="input"
+                  placeholder="Article in Journal"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Period <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.period}
+                  onChange={(e) => setEditForm({ ...editForm, period: e.target.value })}
+                  className="input"
+                  placeholder="2022 to 2025"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date <span className="text-gray-500 text-xs">(Date range)</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.startDate || ''}
+                  onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date <span className="text-gray-500 text-xs">(Date range)</span>
+                </label>
+                <input
+                  type="date"
+                  value={editForm.endDate || ''}
+                  onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                  className="input"
+                />
+              </div>
             </div>
 
             <div>
