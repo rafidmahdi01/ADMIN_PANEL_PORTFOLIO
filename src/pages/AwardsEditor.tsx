@@ -13,7 +13,6 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
-  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Award | null>(null);
   const [saving, setSaving] = useState(false);
@@ -30,7 +29,6 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
       console.log('📋 Records:', result.data);
       setAwards(result.data);
       setSha(result.sha);
-      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load awards. Check GitHub configuration.');
@@ -69,8 +67,7 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
         'Award',
         'awards',
         `Deleted award: ${awards[index].title}`,
-        sha,
-        originalContent
+        sha
       );
       await loadAwards();
     } catch (err) {
@@ -128,8 +125,7 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
         'Award',
         'awards',
         message,
-        sha,
-        originalContent
+        sha
       );
 
       console.log('✅ Save successful! Reloading data...');

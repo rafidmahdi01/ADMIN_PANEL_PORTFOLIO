@@ -13,7 +13,6 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
-  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<ResearchProject | null>(null);
   const [saving, setSaving] = useState(false);
@@ -30,7 +29,6 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
       console.log('📋 Records:', result.data);
       setProjects(result.data);
       setSha(result.sha);
-      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load research projects. Check GitHub configuration.');
@@ -70,8 +68,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         'ResearchProject',
         'projects',
         `Deleted research project: ${projects[index].title}`,
-        sha,
-        originalContent
+        sha
       );
       await loadProjects();
     } catch (err) {
@@ -129,8 +126,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         'ResearchProject',
         'projects',
         message,
-        sha,
-        originalContent
+        sha
       );
 
       console.log('✅ Save successful! Reloading data...');

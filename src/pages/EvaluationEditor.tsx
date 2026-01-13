@@ -13,7 +13,6 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
-  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Evaluation | null>(null);
   const [saving, setSaving] = useState(false);
@@ -30,7 +29,6 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
       console.log('📋 Records:', result.data);
       setEvaluations(result.data);
       setSha(result.sha);
-      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load evaluations. Check GitHub configuration.');
@@ -70,8 +68,7 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
         'Evaluation',
         'evaluation',
         `Deleted evaluation: ${evaluations[index].position}`,
-        sha,
-        originalContent
+        sha
       );
       await loadEvaluations();
     } catch (err) {
@@ -129,8 +126,7 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
         'Evaluation',
         'evaluation',
         message,
-        sha,
-        originalContent
+        sha
       );
 
       console.log('✅ Save successful! Reloading data...');

@@ -13,7 +13,6 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sha, setSha] = useState('');
-  const [originalContent, setOriginalContent] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Presentation | null>(null);
   const [saving, setSaving] = useState(false);
@@ -30,7 +29,6 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
       console.log('📋 Records:', result.data);
       setPresentations(result.data);
       setSha(result.sha);
-      setOriginalContent(result.originalContent);
       setError('');
     } catch (err) {
       setError('Failed to load presentations. Check GitHub configuration.');
@@ -71,8 +69,7 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
         'Presentation',
         'presentations',
         `Deleted presentation: ${presentations[index].title}`,
-        sha,
-        originalContent
+        sha
       );
       await loadPresentations();
     } catch (err) {
@@ -130,8 +127,7 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
         'Presentation',
         'presentations',
         message,
-        sha,
-        originalContent
+        sha
       );
 
       console.log('✅ Save successful! Reloading data...');
