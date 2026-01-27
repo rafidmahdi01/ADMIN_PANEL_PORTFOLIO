@@ -4,7 +4,7 @@ import { githubService } from '@/services/github';
 import type { Award } from '@/types';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 // Import updates arrays from D:\TAYLORS\data\awards.updates.ts
-import { awardsDataUpdates, membershipsDataUpdates, partnerOrganizationsUpdates } from '../../data/awards.updates';
+import { awardsDataUpdates, membershipsDataUpdates, partnerOrganizationsUpdates } from '../data/awards.updates';
 
 interface AwardsEditorProps {
   onLogout: () => void;
