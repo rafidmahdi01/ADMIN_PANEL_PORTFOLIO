@@ -70,7 +70,7 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
         'evaluation',
         updated,
         'Evaluation',
-        'evaluation',
+        'evaluationActivitiesUpdates',
         `Deleted evaluation: ${evaluations[index].position}`,
         sha
       );
@@ -128,7 +128,7 @@ export default function EvaluationEditor({ onLogout }: EvaluationEditorProps) {
         'evaluation',
         updated,
         'Evaluation',
-        'evaluation',
+        'evaluationActivitiesUpdates',
         message,
         sha
       );

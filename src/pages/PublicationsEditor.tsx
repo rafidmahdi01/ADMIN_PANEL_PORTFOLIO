@@ -3,6 +3,8 @@ import EditorLayout from '@/components/EditorLayout';
 import { githubService } from '@/services/github';
 import type { Publication } from '@/types';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+// Import updates arrays from D:\TAYLORS\data\publications.updates.ts
+import { publicationsUpdates, booksUpdates, bookChaptersUpdates, journalArticlesUpdates, proceedingsArticlesUpdates } from '../../../../TAYLORS/data/publications.updates';
 
 interface PublicationsEditorProps {
   onLogout: () => void;
@@ -71,6 +73,29 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         `Deleted publication: ${publications[index].title}`,
         sha
       );
+
+      // Track delete in the appropriate array
+      const deletedPublication = publications[index];
+      const updateData = {
+        timestamp: new Date().toISOString(),
+        action: 'delete',
+        data: deletedPublication
+      };
+
+      // Push to specific type array
+      if (deletedPublication.type === 'book') {
+        booksUpdates.push(updateData);
+      } else if (deletedPublication.type === 'book-chapter') {
+        bookChaptersUpdates.push(updateData);
+      } else if (deletedPublication.type === 'journal') {
+        journalArticlesUpdates.push(updateData);
+      } else if (deletedPublication.type === 'conference' || deletedPublication.type === 'proceedings') {
+        proceedingsArticlesUpdates.push(updateData);
+      }
+
+      // Also push to general publications updates
+      publicationsUpdates.push(updateData);
+
       await loadPublications();
     } catch (err) {
       setError('Failed to delete publication');
@@ -132,6 +157,27 @@ export default function PublicationsEditor({ onLogout }: PublicationsEditorProps
         message,
         sha
       );
+
+      // Track update in the appropriate array
+      const updateData = {
+        timestamp: new Date().toISOString(),
+        action: editingIndex === -1 ? 'add' : 'edit',
+        data: editForm
+      };
+
+      // Push to specific type array
+      if (editForm.type === 'book') {
+        booksUpdates.push(updateData);
+      } else if (editForm.type === 'book-chapter') {
+        bookChaptersUpdates.push(updateData);
+      } else if (editForm.type === 'journal') {
+        journalArticlesUpdates.push(updateData);
+      } else if (editForm.type === 'conference' || editForm.type === 'proceedings') {
+        proceedingsArticlesUpdates.push(updateData);
+      }
+
+      // Also push to general publications updates
+      publicationsUpdates.push(updateData);
 
       console.log('✅ Save successful! Reloading data...');
       await loadPublications();

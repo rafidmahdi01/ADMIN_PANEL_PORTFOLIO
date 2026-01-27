@@ -3,6 +3,8 @@ import EditorLayout from '@/components/EditorLayout';
 import { githubService } from '@/services/github';
 import type { Award } from '@/types';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+// Import updates arrays from D:\TAYLORS\data\awards.updates.ts
+import { awardsDataUpdates, membershipsDataUpdates, partnerOrganizationsUpdates } from '../../../../TAYLORS/data/awards.updates';
 
 interface AwardsEditorProps {
   onLogout: () => void;
@@ -73,6 +75,26 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
         `Deleted award: ${awards[index].title}`,
         sha
       );
+
+      // Track delete in the appropriate array
+      const deletedAward = awards[index];
+      const updateData = {
+        timestamp: new Date().toISOString(),
+        action: 'delete',
+        data: deletedAward
+      };
+
+      // Push to specific category array
+      if (deletedAward.category === 'awards') {
+        awardsDataUpdates.push(updateData);
+      } else if (deletedAward.category === 'services') {
+        membershipsDataUpdates.push(updateData);
+      } else if (deletedAward.category === 'honors' || deletedAward.category === 'fellowships') {
+        partnerOrganizationsUpdates.push(updateData);
+      } else {
+        awardsDataUpdates.push(updateData);
+      }
+
       await loadAwards();
     } catch (err) {
       setError('Failed to delete award');
@@ -131,6 +153,26 @@ export default function AwardsEditor({ onLogout }: AwardsEditorProps) {
         message,
         sha
       );
+
+      // Track update in the appropriate array
+      const updateData = {
+        timestamp: new Date().toISOString(),
+        action: editingIndex === -1 ? 'add' : 'edit',
+        data: editForm
+      };
+
+      // Push to specific category array
+      if (editForm.category === 'awards') {
+        awardsDataUpdates.push(updateData);
+      } else if (editForm.category === 'services') {
+        membershipsDataUpdates.push(updateData);
+      } else if (editForm.category === 'honors' || editForm.category === 'fellowships') {
+        // Assuming honors/fellowships go to partnerOrganizationsUpdates or adjust as needed
+        partnerOrganizationsUpdates.push(updateData);
+      } else {
+        // Default to awardsDataUpdates
+        awardsDataUpdates.push(updateData);
+      }
 
       console.log('✅ Save successful! Reloading data...');
       await loadAwards();

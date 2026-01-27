@@ -68,7 +68,7 @@ export default function ResearchProjectsEditor({ onLogout }: ResearchProjectsEdi
         'research-projects',
         updated,
         'ResearchProject',
-        'projects',
+        'researchProjectsUpdates',
         `Deleted research project: ${projects[index].title}`,
         sha
       );

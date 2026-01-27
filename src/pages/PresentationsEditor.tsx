@@ -3,6 +3,8 @@ import EditorLayout from '@/components/EditorLayout';
 import { githubService } from '@/services/github';
 import type { Presentation } from '@/types';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+// Import updates arrays from D:\TAYLORS\data\presentations.updates.ts
+import { keynoteDataUpdates, invitedSpeakerDataUpdates, eventOrganiserDataUpdates, oralPresenterDataUpdates } from '../../../../TAYLORS/data/presentations.updates';
 
 interface PresentationsEditorProps {
   onLogout: () => void;
@@ -75,6 +77,26 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
         `Deleted presentation: ${presentations[index].title}`,
         sha
       );
+
+      // Track delete in the appropriate array
+      const deletedPresentation = presentations[index];
+      const updateData = {
+        timestamp: new Date().toISOString(),
+        action: 'delete',
+        data: deletedPresentation
+      };
+
+      // Push to specific type array
+      if (deletedPresentation.type === 'keynote') {
+        keynoteDataUpdates.push(updateData);
+      } else if (deletedPresentation.type === 'invited') {
+        invitedSpeakerDataUpdates.push(updateData);
+      } else if (deletedPresentation.type === 'event-organiser') {
+        eventOrganiserDataUpdates.push(updateData);
+      } else if (deletedPresentation.type === 'oral-presenter') {
+        oralPresenterDataUpdates.push(updateData);
+      }
+
       await loadPresentations();
     } catch (err) {
       setError('Failed to delete presentation');
@@ -133,6 +155,24 @@ export default function PresentationsEditor({ onLogout }: PresentationsEditorPro
         message,
         sha
       );
+
+      // Track update in the appropriate array
+      const updateData = {
+        timestamp: new Date().toISOString(),
+        action: editingIndex === -1 ? 'add' : 'edit',
+        data: editForm
+      };
+
+      // Push to specific type array
+      if (editForm.type === 'keynote') {
+        keynoteDataUpdates.push(updateData);
+      } else if (editForm.type === 'invited') {
+        invitedSpeakerDataUpdates.push(updateData);
+      } else if (editForm.type === 'event-organiser') {
+        eventOrganiserDataUpdates.push(updateData);
+      } else if (editForm.type === 'oral-presenter') {
+        oralPresenterDataUpdates.push(updateData);
+      }
 
       console.log('✅ Save successful! Reloading data...');
       await loadPresentations();
