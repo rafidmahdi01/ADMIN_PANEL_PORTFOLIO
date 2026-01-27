@@ -15,15 +15,19 @@ export default function Login({ onLogin }: LoginProps) {
     setError('');
     setLoading(true);
 
-    // Simple password check (in production, use proper authentication)
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-    
-    if (password === adminPassword) {
+    // Support multiple admin passwords
+    const adminPasswords = [
+      import.meta.env.VITE_ADMIN_PASSWORD,
+      import.meta.env.VITE_ADMIN_PASSWORD2 // Add a second password via env
+    ].filter(Boolean);
+
+    if (adminPasswords.includes(password)) {
+      localStorage.setItem('adminAuth', 'true');
       onLogin();
     } else {
       setError('Invalid password');
     }
-    
+
     setLoading(false);
   };
 
