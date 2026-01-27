@@ -3,8 +3,8 @@ import EditorLayout from '@/components/EditorLayout';
 import { githubService } from '@/services/github';
 import type { Publication } from '@/types';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
-// Import updates arrays from D:\TAYLORS\data\publications.updates.ts
-import { publicationsUpdates, booksUpdates, bookChaptersUpdates, journalArticlesUpdates, proceedingsArticlesUpdates } from '../../../../TAYLORS/data/publications.updates';
+// Import updates arrays from data/publications.updates.ts
+import { publicationsUpdates, booksUpdates, bookChaptersUpdates, journalArticlesUpdates, proceedingsArticlesUpdates } from '../../data/publications.updates';
 
 interface PublicationsEditorProps {
   onLogout: () => void;

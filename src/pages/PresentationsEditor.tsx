@@ -4,7 +4,7 @@ import { githubService } from '@/services/github';
 import type { Presentation } from '@/types';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 // Import updates arrays from D:\TAYLORS\data\presentations.updates.ts
-import { keynoteDataUpdates, invitedSpeakerDataUpdates, eventOrganiserDataUpdates, oralPresenterDataUpdates } from '../../../../TAYLORS/data/presentations.updates';
+import { keynoteDataUpdates, invitedSpeakerDataUpdates, eventOrganiserDataUpdates, oralPresenterDataUpdates } from '../../data/presentations.updates';
 
 interface PresentationsEditorProps {
   onLogout: () => void;
